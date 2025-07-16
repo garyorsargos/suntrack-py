@@ -7,11 +7,12 @@ A lightweight Python library for querying the publicly available “Tracking‑t
 ## 🚀 Features
 
 - 🔓 **Anonymous S3 access** (no AWS credentials needed) via `s3fs`
-- 🗂️ **Flexible filtering** by partition fields: `year`, `state`, `technology`, etc.
+- 🗂️ **Flexible filtering** by partition fields: `year`, `state`, etc.
 - 🦥 **Lazy loading**—only downloads the Parquet files you request
 - 📊 **pandas.DataFrame** output for immediate data manipulation
 - 🔍 **Automatic discovery** of available partitions
-- 🧮 **Flexible in-memory filtering** (e.g., `system_size > 5000`)
+- 🧮 **Flexible in-memory filtering** (e.g., `system_size > 5000`, `module_technology_1 == "CSP"`)
+- ⏳ **Progress bars** for file loading and filtering with [tqdm](https://tqdm.github.io/) (optional, but recommended)
 
 ---
 
@@ -30,6 +31,12 @@ Then install dependencies:
 pip install -r requirements.txt
 ```
 
+> **Note:** For the best experience, install `tqdm` to enable progress bars in the terminal and Jupyter notebooks:
+> ```bash
+> pip install tqdm
+> ```
+> If you use the provided `requirements.txt`, `tqdm` will be installed automatically.
+
 ---
 
 ## 🛠️ Basic Usage
@@ -46,9 +53,9 @@ df_ca2019 = client.query(year=2019, state="CA")
 print(df_ca2019.head())
 ```
 
-### 3. Further filter by technology
+### 3. Further filter by technology (in-memory)
 ```python
-df_ca2019_csp = client.query(year=2019, state="CA", technology="CSP")
+df_ca2019_csp = client.query(year=2019, state="CA", field_filters={"module_technology_1": ("==", "CSP")})
 print(df_ca2019_csp.head())
 ```
 
@@ -86,6 +93,18 @@ All example scripts are in the `examples/` folder. Run them from the project roo
 ```bash
 python examples/example_query_system_size.py
 ```
+
+---
+
+## ⏳ Progress Bars with tqdm
+
+This library uses [tqdm](https://tqdm.github.io/) to show progress bars for file loading and filtering steps. If `tqdm` is not installed, simple print statements will be used instead.
+
+- **Recommended:** Install `tqdm` for a better experience:
+  ```bash
+  pip install tqdm
+  ```
+- Works in both terminal and Jupyter notebook environments.
 
 ---
 
