@@ -12,6 +12,7 @@ A lightweight Python library for querying the publicly available “Tracking‑t
 - 📊 **pandas.DataFrame** output for immediate data manipulation
 - 🔍 **Automatic discovery** of available partitions
 - 🧮 **Flexible in-memory filtering** (e.g., `system_size > 5000`, `module_technology_1 == "CSP"`)
+- 📅 **Year column** automatically added to all queries for easy multi-year data differentiation
 - ⏳ **Progress bars** for file loading and filtering with [tqdm](https://tqdm.github.io/) (optional, but recommended)
 
 ---
@@ -63,6 +64,14 @@ print(df_ca2019_csp.head())
 ```python
 df_large = client.query(year=2019, state="CA", field_filters={"system_size": (">", 5000)})
 print(df_large.head())
+```
+
+### 5. Multi-year queries with year column
+```python
+# Query multiple years - each row includes a 'year' column
+df_multi = client.query(year=[2018, 2019], state="CA")
+print(f"Years in dataset: {sorted(df_multi['year'].unique())}")
+print(df_multi.head())
 ```
 
 ---

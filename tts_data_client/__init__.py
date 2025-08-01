@@ -39,6 +39,9 @@ class TTSClient:
         """
         Query the Tracking-the-Sun dataset for given year(s) and state(s).
         Accepts single values, lists, ranges, or 'all' for both year and state.
+        
+        Returns a pandas DataFrame with all original columns plus a 'year' column
+        indicating the source year for each row (useful for multi-year queries).
         """
         # Discover all years/states if needed
         all_years = self._list_years()
@@ -62,7 +65,10 @@ class TTSClient:
                     if not _HAS_TQDM:
                         print(f"Loading {file} ...")
                     with self.fs.open(file, "rb") as f:
-                        dfs.append(pd.read_parquet(f, engine="pyarrow"))
+                        df_temp = pd.read_parquet(f, engine="pyarrow")
+                        # Add year column to help differentiate between years in multi-year queries
+                        df_temp['year'] = y
+                        dfs.append(df_temp)
         if not dfs:
             raise FileNotFoundError("No Parquet files found for the given query parameters.")
         print("Concatenating data frames...")
@@ -124,7 +130,9 @@ class TTSClient:
                 if files:
                     with self.fs.open(files[0], "rb") as f:
                         df = pd.read_parquet(f, engine="pyarrow")
-                    return list(df.columns)
+                    # Include the year column that gets added during queries
+                    fields = list(df.columns) + ['year']
+                    return fields
         raise FileNotFoundError("No Parquet files found for the given query parameters.")
 
     def count_rows(self, year: Union[int, List[int], range, str], state: Union[str, List[str], None] = None, max_files: Optional[int] = None) -> int:
